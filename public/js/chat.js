@@ -8,8 +8,9 @@ const $sendLocationButton= document.querySelector('#sendLocation')
 const $messages= document.querySelector('#messages')
 
 //Templates
-const $messageTemplate= document.querySelector('#message-template').innerHTML
+const $messageTemplate= document.querySelector('#message-template').innerHTML //innerHTML grabs its html
 const $locationTemplate= document.querySelector('#location-template').innerHTML
+const $sidebarTemplate= document.querySelector('#sidebar-template').innerHTML
 
 //Options
 const {username,room} = Qs.parse(location.search, {ignoreQueryPrefix: true})
@@ -33,6 +34,14 @@ socket.on('locationMessage',(message)=>{
         createdAt: moment(message.createdAt).format('h:mm A')
     })
     $messages.insertAdjacentHTML('beforeend',html)
+})
+
+socket.on('roomInfo',({room,users})=>{
+    const html=Mustache.render($sidebarTemplate,{
+        room,
+        users
+    })
+    document.querySelector('#sidebar').innerHTML = html
 })
 
 //Sending message

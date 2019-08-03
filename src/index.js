@@ -26,6 +26,10 @@ io.on('connection', (socket)=>{
         socket.join(user.room)
         socket.emit('message',generateMessage('Welcome!'))
         socket.broadcast.to(user.room).emit('message',generateMessage(`${user.username} has joined`))
+        io.to(user.room).emit('roomInfo',{
+            room:user.room,
+            users:getUsers(user.room)
+        })
         callback()
     })
     socket.on('sendMessage',(message,callback)=>{
@@ -42,6 +46,10 @@ io.on('connection', (socket)=>{
         //To check if user was successfully connected before leaving or not
         if (user) {
             io.to(user.room).emit('message',generateMessage(`${user.username} has left`))
+            io.to(user.room).emit('roomInfo',{
+                room:user.room,
+                users:getUsers(user.room)
+            })
         }
     })
     
