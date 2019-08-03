@@ -29,22 +29,25 @@ io.on('connection', (socket)=>{
         callback()
     })
     socket.on('sendMessage',(message,callback)=>{
+        const user = getUser(socket.id)
         const filter= new Filter()
         if(filter.isProfane(message)){
             return callback('Profanity not allowed')
         }
-        io.emit('message',generateMessage(message))
+        io.to(user.room).emit('message',generateMessage(message))
         callback()
     })
     socket.on('disconnect',()=>{
         const user=removeUser(socket.id)
+        //To check if user was successfully connected before leaving or not
         if (user) {
-            io.emit('message',generateMessage(`${user.username} has left`))
+            io.to(user.room).emit('message',generateMessage(`${user.username} has left`))
         }
     })
     
     socket.on('sendLocation',(position,callback)=>{
-        io.emit('locationMessage',generateLocationMessage(`https://google.com/maps?q=${position.latitude},${position.longitude}`))
+        const user = getUser(socket.id)
+        io.to(user.room).emit('locationMessage',generateLocationMessage(`https://google.com/maps?q=${position.latitude},${position.longitude}`))
         callback()
     })
 })
